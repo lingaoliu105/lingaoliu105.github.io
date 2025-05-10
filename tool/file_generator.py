@@ -92,7 +92,7 @@ def create_jekyll_post_file(title, post_date_obj, description, content, tags):
         return None
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(module)s - %(message)s')
+    logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(module)s - %(message)s')
     logger.info("Starting FileGenerator test...")
 
     # Example usage

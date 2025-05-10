@@ -1,88 +1,188 @@
-import openai
+import time
+import requests
+import json
 import logging
-from .config_manager import get_openai_api_key, get_openai_api_base, get_llm_model
+import os # Added os import
+from .config_manager import get_llm_api_key, get_llm_api_endpoint_base, get_llm_model, get_llm_extra_params
+import re
 
 # Configure basic logging
 logger = logging.getLogger(__name__)
 
+# Path to the prompts file
+PROMPTS_FILE = os.path.join(os.path.dirname(__file__), "prompts.json")
+
+def load_prompts():
+    """Loads prompts from the JSON file."""
+    try:
+        with open(PROMPTS_FILE, 'r', encoding='utf-8') as f:
+            prompts = json.load(f)
+        logger.info(f"Successfully loaded prompts from {PROMPTS_FILE}")
+        return prompts
+    except FileNotFoundError:
+        logger.error(f"Prompts file not found: {PROMPTS_FILE}")
+        raise
+    except json.JSONDecodeError:
+        logger.error(f"Error decoding JSON from prompts file: {PROMPTS_FILE}")
+        raise
+
 class LLMHandler:
     def __init__(self):
-        """Initializes the LLM client using API key, base URL, and model from config."""
-        self.api_key = get_openai_api_key()
-        self.api_base = get_openai_api_base()
-        self.model_name = get_llm_model()
+        """Initializes the HTTP client settings using API key, endpoint URL, model, and extra params from config."""
+        self.api_key = get_llm_api_key()
+        llm_api_base = get_llm_api_endpoint_base()
+        if not llm_api_base:
+            raise ValueError("LLM API base endpoint (api_base in config under [llm_api]) is not configured.")
+        self.endpoint_url = llm_api_base.rstrip('/') + "/v1/chat/completions"
         
-        self.client = openai.OpenAI(
-            api_key=self.api_key,
-            base_url=self.api_base # This will be None if not set in config, openai lib handles it
-        )
-        logger.info("LLMHandler initialized.")
-        if self.api_base:
-            logger.info(f"Using API base: {self.api_base}")
+        self.model_name = get_llm_model()
+        self.extra_params = get_llm_extra_params()
+        self.prompts = load_prompts() # Load prompts
+        
+        logger.info("LLMHandler initialized for direct HTTP requests.")
+        logger.info(f"Using LLM API Endpoint: {self.endpoint_url}")
         logger.info(f"Using LLM model: {self.model_name}")
+        if self.extra_params:
+            logger.info(f"Using LLM extra params: {self.extra_params}")
 
     def _make_llm_request(self, prompt, max_tokens=1500, temperature=0.7):
-        """Helper function to make a request to the LLM."""
+        """Helper function to make a direct HTTP request to the LLM API."""
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json",
+            "Accept": "application/json" # Often good practice
+        }
+
+        # Base payload structure, assuming OpenAI compatibility for messages, etc.
+        payload = {
+            "model": self.model_name,
+            "messages": [
+                {"role": "system", "content": self.prompts.get("system_prompt", "You are a helpful assistant.")}, # Use loaded system prompt
+                {"role": "user", "content": prompt}
+            ],
+            "max_tokens": max_tokens,
+            "temperature": temperature,
+            "stream": False, # Hardcoded as the tool is not built for streaming
+            # "n": 1, # Default for most models, can be added to extra_params if needed
+            # "stop": None, # Can be added to extra_params if needed
+        }
+
+        # Merge extra_params from config (e.g., enable_thinking, top_p, etc.)
+        # This allows overriding defaults like temperature or adding new ones.
+        if self.extra_params:
+            payload.update(self.extra_params)
+            logger.debug(f"Payload includes merged extra_params: {self.extra_params}")
+
+        logger.debug(f"Sending payload to LLM ({self.model_name}): {json.dumps(payload, indent=2)[:500]}...") # Log part of the payload
+
         try:
-            logger.debug(f"Sending prompt to LLM ({self.model_name}): {prompt[:100]}...")
-            response = self.client.chat.completions.create(
-                model=self.model_name,
-                messages=[
-                    {"role": "system", "content": "You are a helpful assistant that writes technical blog posts in English."},
-                    {"role": "user", "content": prompt}
-                ],
-                max_tokens=max_tokens,
-                temperature=temperature,
-                n=1,
-                stop=None
-            )
-            logger.debug("Received response from LLM.")
-            return response.choices[0].message.content.strip()
-        except openai.APIConnectionError as e:
-            logger.error(f"LLM API Connection Error: {e}")
-            raise Exception(f"Failed to connect to LLM API: {e}")
-        except openai.APIStatusError as e:
-            logger.error(f"LLM API Status Error (code {e.status_code}): {e.response}")
-            raise Exception(f"LLM API returned an error: {e.status_code} - {e.response}")
+            request_start_time = time.time()
+            response = requests.post(self.endpoint_url, headers=headers, json=payload) # Added timeout (3 minutes)
+            response.raise_for_status()  # Raises an HTTPError for bad responses (4XX or 5XX)
+            
+            response_json = response.json()
+            request_end_time = time.time()
+            request_duration = request_end_time - request_start_time
+            logger.debug(f"LLM request completed in {request_duration:.2f} seconds")
+            logger.debug(f"Received LLM response: {json.dumps(response_json, indent=2)[:500]}...")
+            
+            # Assuming OpenAI-compatible response structure
+            if response_json.get("choices") and isinstance(response_json["choices"], list) and len(response_json["choices"]) > 0:
+                choice = response_json["choices"][0]
+                if choice.get("message") and isinstance(choice["message"], dict) and "content" in choice["message"]:
+                    return choice["message"]["content"].strip()
+                elif choice.get("text") : # Some models might use "text" like older completion APIs
+                    return choice.get("text").strip()
+            
+            logger.error(f"LLM response did not contain expected content structure. Response: {response_json}")
+            raise Exception("LLM response format error: No valid message content found.")
+
+        except requests.exceptions.Timeout as e:
+            logger.error(f"LLM API request timed out: {e}")
+            raise Exception(f"LLM API request timed out after 180 seconds: {e}")
+        except requests.exceptions.HTTPError as e:
+            logger.error(f"LLM API HTTP Error: {e.response.status_code} - {e.response.text}")
+            try:
+                error_details = e.response.json() # Try to get more details if JSON error response
+                logger.error(f"LLM API Error Details: {error_details}")
+                # You could extract more specific error messages here from error_details if the API provides them
+                # e.g., error_details.get('error', {}).get('message')
+                raise Exception(f"LLM API returned HTTP {e.response.status_code}. Detail: {error_details}")
+            except json.JSONDecodeError:
+                 raise Exception(f"LLM API returned HTTP {e.response.status_code}. Response: {e.response.text}")
+        except requests.exceptions.RequestException as e:
+            logger.error(f"LLM API Request Error: {e}")
+            raise Exception(f"Failed to make request to LLM API: {e}")
+        except json.JSONDecodeError as e:
+            logger.error(f"Failed to parse LLM API JSON response: {e}. Response text: {response.text if 'response' in locals() else 'N/A'}")
+            raise Exception(f"LLM API response was not valid JSON: {e}")
         except Exception as e:
             logger.error(f"An unexpected error occurred while querying LLM: {e}")
-            raise Exception(f"An unexpected error occurred: {e}")
+            # Re-raise to be caught by the main error handler or specific logic
+            raise
+
+    def _parse_tags_from_llm_response(self, response_text):
+        """Parses a comma-separated list of tags from the LLM response."""
+        if not response_text:
+            return []
+        # Remove any leading/trailing fluff like "Suggested Tags: " or similar
+        cleaned_response = response_text.strip()
+        if cleaned_response.lower().startswith("suggested tags:"):
+            cleaned_response = cleaned_response[len("suggested tags:"):].strip()
+        elif cleaned_response.lower().startswith("tags:"):
+            cleaned_response = cleaned_response[len("tags:"):].strip()
+        
+        tags = [tag.strip().lower() for tag in cleaned_response.split(',') if tag.strip()]
+        # Further cleaning: remove any potential quotes around individual tags
+        tags = [tag.strip('"').strip("'") for tag in tags]
+        return list(set(tags)) # Return unique tags
+
+    def generate_tags_for_post(self, title, description, content_preview_length=200):
+        """Generates 3-5 relevant tags for a blog post using its title, description, and content preview."""
+        logger.info(f"Generating tags for post titled: '{title}'")
+        
+        # Taking a snippet of content might be too much or too little, 
+        # description and title are usually good enough for tags.
+        # For now, let's rely on title and description.
+        # If content_preview is needed in the future, it can be passed in.
+
+        prompt_template = self.prompts.get("generate_tags")
+        if not prompt_template:
+            logger.error("Tag generation prompt template not found.")
+            return []
+        
+        prompt = prompt_template.format(title=title, description=description)
+        
+        try:
+            raw_tags_response = self._make_llm_request(prompt, max_tokens=50, temperature=0.6)
+            if raw_tags_response:
+                generated_tags = self._parse_tags_from_llm_response(raw_tags_response)
+                logger.info(f"LLM suggested tags: {generated_tags} for title: '{title}'")
+                return generated_tags
+            else:
+                logger.warning(f"LLM returned empty response for tag generation for title: '{title}'.")
+                return []
+        except Exception as e:
+            logger.error(f"Error generating tags for title '{title}': {e}")
+            return [] # Return empty list on error
 
     def generate_blog_post_details(self, keyword, blog_date):
-        """Generates blog post title, description, and content for a given keyword and date.
-
-        Args:
-            keyword (str): The keyword/topic for the blog post.
-            blog_date (str): The publication date for the blog post (YYYY-MM-DD).
-
-        Returns:
-            dict: A dictionary with 'title', 'description', and 'content'.
-                  Returns None if generation fails.
-        """
+        """Generates blog post title, description, content, and tags."""
         logger.info(f"Generating blog post for keyword: '{keyword}' on date: {blog_date}")
 
         # 1. Generate Title
-        title_prompt = f"Generate a concise and engaging blog post title (max 10 words) in English for a technical article about \"{keyword}\". The article is for a general technical audience. Return ONLY the title itself, without any surrounding text, explanations, or quotation marks."
-        raw_title_response = self._make_llm_request(title_prompt, max_tokens=40, temperature=0.7) # Increased max_tokens slightly just in case
-        
+        title_prompt_template = self.prompts.get("generate_title")
+        if not title_prompt_template:
+            logger.error("Title generation prompt template not found.")
+            return None
+        title_prompt = title_prompt_template.format(keyword=keyword)
+        raw_title_response = self._make_llm_request(title_prompt, max_tokens=40, temperature=0.7)
         if not raw_title_response:
             logger.error("Failed to generate title (empty response from LLM).")
             return None
-        
-        # Post-processing: Try to extract the cleanest possible title.
-        # Remove common chatty prefixes/suffixes and strip quotes.
-        # This can be made more robust if specific patterns are common.
         cleaned_title = raw_title_response.strip()
-        
-        # Attempt to remove common LLM conversational fluff if it appears before or after a quoted title or a clear title line.
-        # For example, "Here is a good title: \"My Title\"" or "\"My Title\" - I hope this helps!"
-        # A more robust way could be regex to find content within quotes if quotes are consistently used by the model for the title itself.
-        # For now, a simpler stripping and then quote removal.
-        
-        # First, strip common leading/trailing non-title text (heuristic)
         common_prefixes = ["Title:", "Generated Title:", "Here is a title:", "Here's your title:", "Okay, here's a title:"]
         common_suffixes = ["Is this title good?", "I hope this helps."]
-        
         for prefix in common_prefixes:
             if cleaned_title.lower().startswith(prefix.lower()):
                 cleaned_title = cleaned_title[len(prefix):].strip()
@@ -91,42 +191,57 @@ class LLMHandler:
             if cleaned_title.lower().endswith(suffix.lower()):
                 cleaned_title = cleaned_title[:-len(suffix)].strip()
                 break
-
-        # Remove surrounding quotes, if any, after stripping other fluff
         cleaned_title = cleaned_title.strip('"').strip("'").strip()
-
         if not cleaned_title:
             logger.error(f"Failed to extract a clean title from LLM response: '{raw_title_response}'")
             return None
         generated_title = cleaned_title
 
-        # 2. Generate Description (for front matter)
-        description_prompt = f"Write a brief SEO-friendly meta description (max 30 words) in English for a technical blog post titled \"{generated_title}\" which discusses \"{keyword}\"."
-        generated_description = self._make_llm_request(description_prompt, max_tokens=60, temperature=0.7)
-        if not generated_description:
-            logger.warning("Failed to generate description, proceeding without it.")
+        # 2. Generate Description
+        description_prompt_template = self.prompts.get("generate_description")
+        if not description_prompt_template:
+            logger.error("Description generation prompt template not found.")
+            # Continue without description if template is missing, or handle as critical error
             generated_description = ""
+        else:
+            description_prompt = description_prompt_template.format(generated_title=generated_title, keyword=keyword)
+            raw_description_response = self._make_llm_request(description_prompt, max_tokens=70, temperature=0.7)
+            generated_description = ""
+            if raw_description_response:
+                cleaned_description = raw_description_response.strip()
+                for prefix in common_prefixes: cleaned_description = cleaned_description[len(prefix):].strip() if cleaned_description.lower().startswith(prefix.lower()) else cleaned_description
+                for suffix in common_suffixes: cleaned_description = cleaned_description[:-len(suffix)].strip() if cleaned_description.lower().endswith(suffix.lower()) else cleaned_description
+                cleaned_description = re.sub(r'\s*\([^)]*\w[^)]*\)\s*$', '', cleaned_description).strip()
+                cleaned_description = cleaned_description.strip('"').strip("'").strip()
+                generated_description = cleaned_description
+            else:
+                logger.warning("Failed to generate description (empty response from LLM), proceeding without it.")
 
         # 3. Generate Content
-        # We can refine this prompt further based on desired style, length, etc.
-        content_prompt = (
-            f"Write a technical blog post in English, approximately 500-800 words, about \"{keyword}\".\n"
-            f"The title of the post is \"{generated_title}\".\n"
-            f"The blog post is intended for a technical audience but should be accessible.\n"
-            f"Structure the post with an introduction, several main points or sections with clear headings (using Markdown like ## Heading), and a conclusion.\n"
-            f"Ensure the content is informative, well-structured, and engaging.\n"
-            f"Do not include the title or any Jekyll front matter in the output, only the main content of the blog post itself starting from the introduction."
-        )
+        content_prompt_template = self.prompts.get("generate_content")
+        if not content_prompt_template:
+            logger.error("Content generation prompt template not found.")
+            return None
+        content_prompt = content_prompt_template.format(keyword=keyword, generated_title=generated_title)
+        
         generated_content = self._make_llm_request(content_prompt, max_tokens=1200, temperature=0.7)
         if not generated_content:
             logger.error("Failed to generate content.")
             return None
 
+        # 4. Generate Tags using Title and Description
+        llm_generated_tags = []
+        if generated_title and generated_description:
+            llm_generated_tags = self.generate_tags_for_post(generated_title, generated_description)
+        else:
+            logger.warning(f"Skipping LLM tag generation for keyword '{keyword}' due to missing title or description.")
+
         logger.info(f"Successfully generated blog post details for keyword: '{keyword}'. Title: '{generated_title}'")
         return {
             "title": generated_title,
             "description": generated_description,
-            "content": generated_content
+            "content": generated_content,
+            "tags": llm_generated_tags
         }
 
     def expand_keyword_into_subtopics(self, keyword, num_subtopics):
@@ -140,16 +255,13 @@ class LLMHandler:
             list[str]: A list of subtopic strings. Returns empty list on failure.
         """
         logger.info(f"Expanding keyword '{keyword}' into {num_subtopics} subtopics.")
-        prompt = (
-            f"The primary keyword for a series of technical blog posts is \"{keyword}\". "
-            f"I need to create {num_subtopics} distinct blog posts based on this primary keyword, where each post delves into a specific aspect or sub-topic related to \"{keyword}\". "
-            f"Please suggest {num_subtopics} unique sub-topics. "
-            f"Each sub-topic should be suitable as a focus for a standalone technical blog post of 500-800 words. "
-            f"Return ONLY a numbered list of these sub-topics, each on a new line. For example:\n"
-            f"1. First sub-topic\n"
-            f"2. Second sub-topic\n"
-            f"..."
-        )
+        
+        prompt_template = self.prompts.get("expand_keyword")
+        if not prompt_template:
+            logger.error("Keyword expansion prompt template not found.")
+            return []
+            
+        prompt = prompt_template.format(keyword=keyword, num_subtopics=num_subtopics)
         
         response_text = self._make_llm_request(prompt, max_tokens=50 * num_subtopics, temperature=0.6)
         if not response_text:
@@ -160,7 +272,6 @@ class LLMHandler:
         for line in response_text.split('\n'):
             line = line.strip()
             if not line: continue
-            # Attempt to strip numbering like "1. ", "1) ", "- ", etc.
             if '.' in line and line.split('.', 1)[0].isdigit():
                 topic_text = line.split('.', 1)[1].strip()
             elif ')' in line and line.split(')', 1)[0].isdigit():
@@ -172,10 +283,10 @@ class LLMHandler:
             if topic_text:
                 subtopics.append(topic_text)
         
-        if len(subtopics) == num_subtopics:
-            logger.info(f"Successfully expanded keyword '{keyword}' into {len(subtopics)} subtopics: {subtopics}")
-            return subtopics
-        elif subtopics: # Got some, but maybe not enough
+        if len(subtopics) >= num_subtopics: # Changed to >= to be more lenient if LLM gives more
+             logger.info(f"Successfully expanded keyword '{keyword}' into {len(subtopics)} subtopics (requested {num_subtopics}): {subtopics[:num_subtopics]}")
+             return subtopics[:num_subtopics] # Return only the number requested
+        elif subtopics: # Got some, but not enough
             logger.warning(f"Expected {num_subtopics} subtopics for '{keyword}', but LLM generated {len(subtopics)}. Using what was generated: {subtopics}")
             return subtopics
         else:
@@ -185,7 +296,7 @@ class LLMHandler:
 if __name__ == "__main__":
     # This is for basic testing. 
     # Ensure your tool/config.ini is set up with a valid API key.
-    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(module)s - %(message)s')
+    logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(module)s - %(message)s')
     logger.info("Starting LLMHandler test...")
     
     try:

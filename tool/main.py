@@ -3,10 +3,10 @@ import logging
 import sys
 import os
 from datetime import datetime
-import openai # Import openai for its specific exceptions
+# No longer importing openai specific exceptions directly
 
 # Relative imports for package structure
-from .config_manager import get_setting, get_openai_api_key # Ensure API key can be checked early
+from .config_manager import get_setting, get_llm_api_key # Updated function name
 from .date_utils import generate_dates
 from .llm_handler import LLMHandler
 from .file_generator import create_jekyll_post_file, POSTS_DIR
@@ -26,7 +26,7 @@ def setup_logging():
     # For simplicity, placing in project root for now.
 
     logging.basicConfig(
-        level=logging.INFO,
+        level=logging.DEBUG,
         format="%(asctime)s - %(levelname)s - %(name)s - %(module)s - %(message)s",
         handlers=[
             logging.FileHandler(log_file_path),
@@ -63,8 +63,8 @@ def main():
 
     try:
         # Early check for API key to fail fast
-        get_openai_api_key()
-        logger.info("OpenAI API key found in configuration.")
+        get_llm_api_key() # Updated function call
+        logger.info("LLM API key found in configuration.")
 
         blog_dates = generate_dates(args.start_date, args.end_date)
         if not blog_dates:
@@ -116,23 +116,31 @@ def main():
                 logger.error(f"Failed to generate blog post details for keyword '{current_keyword}'. Skipping.")
                 continue
 
-            # Combine original keyword with any default tags provided
-            post_tags = [tag.strip().lower().replace(" ", "-") for tag in current_keyword.split()] # Simple slugify for keyword as tag
-            if args.tags:
-                default_tags = [dt.strip() for dt in args.tags]
-                post_tags.extend(default_tags)
-            post_tags = sorted(list(set(post_tags))) # Unique sorted tags
-            logger.info(f"Using tags for post: {post_tags}")
+            # Tags processing:
+            # Start with LLM generated tags (which might be an empty list)
+            current_post_tags = post_details.get("tags", []) 
+            logger.info(f"LLM suggested tags: {current_post_tags}")
 
-            # Create the file path relative to project root for git_add_commit
-            # create_jekyll_post_file already saves it in the correct _posts location
-            # and returns an absolute path.
+            # Add tags derived from the current keyword as a fallback or supplement
+            # if LLM didn't provide any or to ensure keyword presence.
+            keyword_based_tags = [tag.strip().lower().replace(" ", "-") for tag in current_keyword.split()]
+            current_post_tags.extend(keyword_based_tags)
+            
+            # Add default tags provided via command line argument
+            if args.tags:
+                default_tags = [dt.strip().lower() for dt in args.tags]
+                current_post_tags.extend(default_tags)
+            
+            # Ensure all tags are lowercase, unique, and sorted
+            final_post_tags = sorted(list(set([tag.lower() for tag in current_post_tags if tag]))) # Filter out empty tags if any
+            logger.info(f"Final tags for post '{post_details["title"]}': {final_post_tags}")
+
             blog_file_path = create_jekyll_post_file(
                 title=post_details["title"],
                 post_date_obj=post_date,
                 description=post_details["description"],
                 content=post_details["content"],
-                tags=post_tags
+                tags=final_post_tags # Use the combined and cleaned tags
             )
 
             if blog_file_path:
@@ -163,14 +171,13 @@ def main():
 
     except FileNotFoundError as e:
         logger.error(f"Configuration or essential file not found: {e}")
-        logger.error("Please ensure tool/config.ini exists and is correctly set up (copy from tool/config.example.ini).")
-    except ValueError as e:
+        logger.error("Please ensure tool/config.ini exists and is correctly set up (copy from tool/config.example.ini) with the [llm_api] section.")
+    except ValueError as e: # Catches issues from generate_dates, config validation, etc.
         logger.error(f"Configuration error or invalid input: {e}")
-    except openai.APIConnectionError as e: # Now openai is defined
-        logger.error(f"LLM API Connection Error: {e}. Check your network or API base URL.")
-    except openai.APIStatusError as e: # Now openai is defined
-        logger.error(f"LLM API Error (Status {e.status_code}): {e.response}. Check your API key or model access.")
+    # Generic Exception will catch errors from LLMHandler (e.g., HTTP errors, timeouts)
     except Exception as e:
+        # This will now catch errors from LLMHandler (e.g., HTTP errors, timeouts, response parsing issues)
+        # as well as any other unexpected errors.
         logger.critical(f"An unexpected critical error occurred: {e}", exc_info=True) # Log traceback
     finally:
         logging.info("Blog generation process finished.")

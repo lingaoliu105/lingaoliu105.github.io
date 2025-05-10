@@ -28,19 +28,31 @@ def _run_git_command(command, working_dir=PROJECT_ROOT, env=None):
             logger.info(f"Git command successful: {' '.join(command)}")
             if stdout:
                 logger.debug(f"Git stdout:\n{stdout}")
-            return True, stdout
+            return True, stdout.strip()
         else:
             logger.error(f"Git command failed: {' '.join(command)}")
             logger.error(f"Git stderr:\n{stderr}")
             if stdout:
                 logger.error(f"Git stdout:\n{stdout}")
-            return False, stderr
+            return False, stderr.strip()
     except FileNotFoundError:
         logger.error("Git command not found. Ensure Git is installed and in your PATH.")
         return False, "Git command not found."
     except Exception as e:
         logger.error(f"An unexpected error occurred while running Git command: {e}")
         return False, str(e)
+
+def _get_current_branch():
+    """Determines the current active Git branch."""
+    success, output = _run_git_command(["git", "rev-parse", "--abbrev-ref", "HEAD"])
+    if success and output:
+        logger.info(f"Determined current Git branch: {output}")
+        return output
+    else:
+        logger.warning("Could not determine current Git branch. Will attempt to push to remote's default (HEAD).")
+        # Fallback to pushing to HEAD which usually means the remote's default branch
+        # Or we could default to 'main' or make it configurable if this often fails.
+        return "HEAD" # Pushing to HEAD usually resolves to the remote's default branch
 
 def git_add_commit(file_path, commit_date_obj, commit_message_title):
     """Adds a file to Git and commits it with a specific author/committer date.
@@ -86,24 +98,23 @@ def git_add_commit(file_path, commit_date_obj, commit_message_title):
     logger.info(f"Successfully added and committed {relative_file_path} with commit date {commit_datetime_str}")
     return True
 
-def git_push(remote_name="origin", branch_name="main"):
-    """Pushes changes to the specified remote and branch.
-    
-    Args:
-        remote_name (str): The name of the remote repository (default: "origin").
-        branch_name (str): The name of the branch to push (default: "main").
+def git_push(remote_name="origin"):
+    """Pushes changes to the specified remote and the current active branch."""
+    current_branch = _get_current_branch()
+    # If _get_current_branch returned None or empty (though it falls back to HEAD),
+    # handle it here, though the fallback to HEAD is a reasonable default.
+    if not current_branch: # Should not happen with HEAD fallback, but as a safeguard
+        logger.error("Cannot git push: failed to determine current branch and no fallback.")
+        return False
         
-    Returns:
-        bool: True if successful, False otherwise.
-    """
-    logger.info(f"Attempting to git push to {remote_name}/{branch_name}")
-    push_command = ["git", "push", remote_name, branch_name]
+    logger.info(f"Attempting to git push to {remote_name}/{current_branch}")
+    push_command = ["git", "push", remote_name, current_branch]
     success, _ = _run_git_command(push_command)
     
     if success:
-        logger.info(f"Successfully pushed to {remote_name}/{branch_name}")
+        logger.info(f"Successfully pushed to {remote_name}/{current_branch}")
     else:
-        logger.error(f"git push to {remote_name}/{branch_name} failed.")
+        logger.error(f"git push to {remote_name}/{current_branch} failed.")
     return success
 
 if __name__ == "__main__":
