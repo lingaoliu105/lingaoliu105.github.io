@@ -1,90 +1,45 @@
-# WhatATheme
-markdown: kramdown
+# Welcome to Jekyll!
+#
+# This config file is meant for settings that affect your whole blog, values
+# which you are expected to set up once and rarely edit after that. If you find
+# yourself editing this file very often, consider using Jekyll's data files
+# feature for the data you need to update frequently.
+#
+# For technical reasons, this file is *NOT* reloaded automatically when you use
+# 'bundle exec jekyll serve'. If you change this file, please restart the server process.
+#
+# If you need help with YAML syntax, here are some quick references for you:
+# https://learn-the-web.algonquindesign.ca/topics/markdown-yaml-cheat-sheet/#yaml
+# https://learnxinyminutes.com/docs/yaml/
+#
+# Site settings
+# These are used to personalize your new site. If you look in the HTML files,
+# you will see them accessed via {{ site.title }}, {{ site.email }}, and so on.
+# You can create any custom variable you would like, and they will be accessible
+# in the templates via {{ site.myvariable }}.
 
-# URL of the Site
-url: ''
-# Base URL of the Site (i.e., Name of the Repository in which the Site is hosted)
-baseurl: ''
-
-# Title of the Site
-title: L LAB
-# Description of the Site
-description: Mr.Liu's Tech Blog
-# URL of Image of the Site
-site-image: /WhatATheme/assets/images/meta.jpg
-# Keywords of the Site
-site-keywords: Programming, Blog, Computer Science
-# URL for the Image of custom Favicon
-favicon-url: https://img1.imgtp.com/2023/07/19/8LmSe0Gv.png
-
-
-# URL of the Image of Custom Hero Image (i.e., the image in the background of the very first section of the Homepage)
-heroimage: https://pic1.zhimg.com/80/v2-28843bff930b36498904ec33c2e21232_1440w.webp?source=1940ef5c
-
-# Social Media and Contact
-# If you don't want to use any icon, you can leave them blank.
+title: L Lab
 email: lingaoliu105@gmail.com
-facebook_username: /
-twitter_username: /
-instagram_username: /
-linkedin_username: Liu Lingao
+description: >- # this means to ignore newlines until "baseurl:"
+  Getting Pro Day by Day - IT Engineer's Ultimate Cultivation
+baseurl: "" # the subpath of your site, e.g. /blog
+url: "" # the base hostname & protocol for your site, e.g. http://example.com
+twitter_username: 
 github_username:  lingaoliu105
-youtube_channel_id: /
-reddit_username: /
-behance_username: /
-dribbble_username: /
-spotify_username: KleeSina
-
-# Google Analytics
-google-analytics: UA-163806439-1
-
-# Disqus
-disqus-shortname: Lingao
-
-# Name of the Author
-author-name: Liu Lingao
-# URL for the Image of the Author
-author-image: https://img1.imgtp.com/2023/07/19/IjZZfUM9.jpg
-# 60 Words About the Author
-author-about: I don't major in repairing computers, but I'd like to help.
-# URL to the Author's Profile (i.e., Github, Twitter, Stackoverflow, etc)
-author-url: https://github.com/lingaoliu105
-
-# SASS
-sass:
-  sass_dir: _sass
-  style: compressed
 
 # Build settings
+theme: jekyll-theme-yat
 plugins:
-  - jekyll-admin
   - jekyll-feed
 
-# Permalink
-permalink: "blog/:title"
-
-# Compress
-compress_html:
-  clippings: all
-
-# Defaults
-defaults:
-  -
-    scope:
-      type: 'posts'
-    values:
-      layout: post
-      post-image: ""
-      description: ""
-      tags:
-        - ""
-  -
-    scope:
-      type: 'pages'
-    values:
-      layout: page
-
-# Exclude
+# Exclude from processing.
+# The following items will not be processed, by default.
+# Any item listed under the `exclude:` key here will be automatically added to
+# the internal "default list".
+#
+# Excluded items can be processed by explicitly listing the directories or
+# their entries' file path in the `include:` list.
+#
 exclude:
   - .sass-cache/
   - .jekyll-cache/
