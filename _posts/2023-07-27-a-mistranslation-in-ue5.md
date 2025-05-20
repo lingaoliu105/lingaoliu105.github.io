@@ -1,6 +1,6 @@
 ---
 title: 虚幻引擎5中文UI中的一处误译 A mistranslation in UE5 Chinese UI
-layout: post
+layout: single
 post-image: "https://res.cloudinary.com/startup-grind/image/upload/c_fill,dpr_2.0,f_auto,g_center,h_1080,q_100,w_1080/v1/gcs/platform-data-epic/events/ue4.png"
 description: 偶然间的小发现，希望能帮助到被困惑的朋友
 tags:

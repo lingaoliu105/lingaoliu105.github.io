@@ -2,7 +2,7 @@
 title: Using channel in Go
 
 
-layout: post
+layout: single
 
 
 post-image: "https://th.bing.com/th/id/OIP.DnnkReGamr7ps_2HlGT_FQHaEL?pid=ImgDet&rs=1"

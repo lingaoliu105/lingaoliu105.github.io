@@ -1,6 +1,6 @@
 ---
 title: "Exploring Nginx Use Cases: From Load Balancing to Reverse Proxy"
-layout: post
+layout: single
 post-image: ""
 description: "Discover versatile Nginx use cases including load balancing, reverse proxy, caching, and more. Learn how Nginx optimizes web performance and scales modern applications efficiently."
 tags:
@@ -13,7 +13,7 @@ tags:
 - web performance
 ---
 
-## Introduction
+
 
 Nginx (pronounced "engine-x") is a powerful open-source web server that has become a cornerstone of modern web infrastructure. Originally designed to solve the C10K problem—handling ten thousand simultaneous connections—Nginx has evolved far beyond its initial role as a high-performance HTTP server. Today, it's widely used for load balancing, reverse proxying, caching, and even as an API gateway.
 

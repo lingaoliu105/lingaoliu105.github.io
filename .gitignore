@@ -74,3 +74,5 @@ build-iPhoneSimulator/
 tool/config.ini
 tool/__pycache__
 generation.log
+node_modules
+venv/

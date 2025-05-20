@@ -1,6 +1,6 @@
 ---
 title: "Grep Like a Pro: Essential Hacks for Smarter Text Searching"
-layout: post
+layout: single
 post-image: ""
 description: "Master grep command hacks: case-insensitive search, recursive filtering, regex tricks. Boost Linux/Unix text processing efficiency with expert tips for smarter data analysis."
 tags:
@@ -14,7 +14,7 @@ tags:
 - text search
 ---
 
-## Introduction  
+  
 
 The `grep` command is one of those indispensable tools every developer or system administrator uses daily — whether they're debugging codebases or parsing through logs at midnight during an outage. While many know its basics ("find this string in these files"), there's far more under `grep`'s hood than most realize! This post dives into essential hacks that'll transform your text-searching workflow from pedestrian to pro-grade efficiency while keeping things approachable even if you're not already a Unix wizard at heart!
 

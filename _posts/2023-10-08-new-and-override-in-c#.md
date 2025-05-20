@@ -2,7 +2,7 @@
 title: C# abstract? virtual? new? override? in one table
 
 
-layout: post
+layout: single
 
 
 post-image: "https://th.bing.com/th/id/R.36a6263d2b08e9f9e01ccec32002311a?rik=9Ch%2ffsDlGxw7cw&riu=http%3a%2f%2fwww.maxcsharp.com%2fwp-content%2fuploads%2f2021%2f07%2fcsharplogo.png&ehk=KM58kkhfP%2bHjMWsNUpVJv%2f9Tn0V2SaKDFiWm9rZ4T%2fA%3d&risl=&pid=ImgRaw&r=0"

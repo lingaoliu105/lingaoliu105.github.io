@@ -1,6 +1,6 @@
 ---
 title: "Understanding Redis Data Types: A Practical Guide"
-layout: post
+layout: single
 post-image: ""
 description: "Explore Redis data types with practical examples in this concise guide, covering strings, hashes, lists, sets, and sorted sets for efficient data management."
 tags:

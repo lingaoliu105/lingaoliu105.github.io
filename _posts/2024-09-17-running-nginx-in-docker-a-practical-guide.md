@@ -1,6 +1,6 @@
 ---
 title: "Running Nginx in Docker: A Practical Guide"
-layout: post
+layout: single
 post-image: "https://images.unsplash.com/photo-1598587561463-0e82f3c02f7d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60"
 description: "Learn how to run Nginx in Docker with this practical guide, covering setup, configuration, and optimization for seamless containerized web server deployment."
 tags:
@@ -13,7 +13,7 @@ tags:
 - web server
 ---
 
-## Introduction
+
 
 Docker has revolutionized the way developers and system administrators deploy and manage applications, offering a lightweight and consistent environment across different systems. One of the most common use cases for Docker is running Nginx, a high-performance web server and reverse proxy. Whether you're serving static content, load balancing, or securing your applications with SSL, Docker makes it easy to containerize Nginx and streamline your deployment process.
 
