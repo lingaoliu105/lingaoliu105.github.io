@@ -1,0 +1,31 @@
+---
+# Only the main Sass file needs front matter (the dashes are enough)
+---
+
+@charset "utf-8";
+
+// Import the Minimal Mistakes skin
+@import "minimal-mistakes/skins/{{ site.minimal_mistakes_skin | default: 'default' }}";
+
+// Import core Minimal Mistakes styles
+@import "minimal-mistakes";
+
+// Your custom styles for the header image:
+.page__hero {
+  height: 33.33vh; // 设置容器高度为视口高度的 1/3
+  max-height: 33.33vh; // 确保最大高度也是1/3视口高度
+  overflow: hidden;  // 隐藏图片超出容器的部分
+  display: flex;     // 使用 flexbox 辅助对齐 (可选，object-fit 通常足够)
+  align-items: center; // 垂直居中 flex子元素 (可选)
+  justify-content: center; // 水平居中 flex子元素 (可选)
+  background: none !important; // 移除空的 background-image style 影响
+  margin-bottom: 0 !important; // 移除底部外边距
+}
+
+.page__hero-image { // 这是实际的 <img> 标签
+  width: 100%;         // 图片宽度撑满容器
+  height: 100%;        // 图片高度撑满容器 (相对于 .page__hero 的 33.33vh)
+  object-fit: cover;   // 保持图片纵横比，同时填充容器，必要时裁剪
+  object-position: center center; // 当裁剪时，确保显示图片的中间部分
+  display: block !important; // 确保图片是块级元素，消除行内间隙
+} 

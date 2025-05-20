@@ -19,7 +19,7 @@ locale                   : "en-US"
 rtl                      : # true, false (default) # turns direction of the page into right to left for RTL languages
 title                    : "L Lab"
 title_separator          : "-"
-subtitle                 : "A little bit means a lot"
+subtitle                 : "A Little Bit Means a Lot"
 name                     : "Liu Lingao"
 description              : "Blog posts of a programmer on the way to find inner peace"
 url                      : "https://lingaoliu105.github.io"
