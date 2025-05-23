@@ -11,7 +11,6 @@ tags:
 - custom
 - enterprise
 - enterprise development
-- for
 - quality
 - roslyn
 - roslyn analyzers

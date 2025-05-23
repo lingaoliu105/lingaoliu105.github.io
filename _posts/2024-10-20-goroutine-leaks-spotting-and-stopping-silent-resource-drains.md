@@ -1,17 +1,16 @@
 ---
 title: "Goroutine Leaks: Spotting and Stopping Silent Resource Drains"
 layout: single
-post-image: ""
+
 description: "Learn how to detect and prevent goroutine leaks in Go programs to avoid silent resource drains and improve application performance."
 tags:
-- and
 - concurrency
 - debugging
 - detection
 - go
 - goroutine
 - goroutines
-- leaks:
+- leaks
 - performance optimization
 - prevention
 ---
@@ -20,13 +19,13 @@ tags:
 
 In Go, concurrency is a first-class citizen. Goroutines, lightweight threads managed by the Go runtime, make it easy to build highly performant and scalable applications. However, with great power comes the need for great care—especially when it comes to managing the lifecycle of these goroutines. One of the most insidious issues developers can encounter is a **goroutine leak**, where a goroutine runs indefinitely without completing its task or being properly cleaned up.
 
-Goroutine leaks may not crash your application immediately, but they silently consume memory and other system resources, ultimately leading to application slowdowns, crashes, or unpredictable behavior under load. In this post, we’ll explore what goroutine leaks are, how to detect them, and how to prevent them in your Go applications.
+Goroutine leaks may not crash your application immediately, but they silently consume memory and other system resources, ultimately leading to application slowdowns, crashes, or unpredictable behavior under load. In this post, we'll explore what goroutine leaks are, how to detect them, and how to prevent them in your Go applications.
 
 ---
 
 ## What Is a Goroutine Leak?
 
-A goroutine leak occurs when a goroutine is launched but never exits, even though it no longer has any useful work to perform. This often happens when the goroutine is waiting on a channel or some other resource that never sends a signal for it to proceed. Unlike memory leaks in other languages, goroutine leaks are unique to Go’s concurrency model and are usually the result of subtle logic errors.
+A goroutine leak occurs when a goroutine is launched but never exits, even though it no longer has any useful work to perform. This often happens when the goroutine is waiting on a channel or some other resource that never sends a signal for it to proceed. Unlike memory leaks in other languages, goroutine leaks are unique to Go's concurrency model and are usually the result of subtle logic errors.
 
 Common causes include:
 
@@ -45,7 +44,7 @@ Detecting goroutine leaks early is critical to maintaining the stability and per
 
 ### 1. Use the `pprof` Package
 
-Go’s built-in `net/http/pprof` package is a powerful tool for inspecting the current state of your application, including a list of all active goroutines. If you're using an HTTP server, you can enable pprof with just a few lines:
+Go's built-in `net/http/pprof` package is a powerful tool for inspecting the current state of your application, including a list of all active goroutines. If you're using an HTTP server, you can enable pprof with just a few lines:
 
 ```go
 import _ "net/http/pprof"
@@ -88,7 +87,7 @@ While this won't tell you *which* goroutines are leaking, it can be used to trac
 
 ## Real-World Example of a Goroutine Leak
 
-Let’s look at a simple but common example:
+Let's look at a simple but common example:
 
 ```go
 func main() {
@@ -101,7 +100,7 @@ func main() {
 }
 ```
 
-This code spawns a goroutine that blocks forever waiting for a value on channel `ch`. Since no value is ever sent and the channel is never closed, this goroutine never terminates—it’s a classic leak. When you inspect the goroutines via `pprof`, this one will show up as `chan recv` stuck indefinitely.
+This code spawns a goroutine that blocks forever waiting for a value on channel `ch`. Since no value is ever sent and the channel is never closed, this goroutine never terminates—it's a classic leak. When you inspect the goroutines via `pprof`, this one will show up as `chan recv` stuck indefinitely.
 
 ---
 
@@ -111,7 +110,7 @@ Now that we can detect leaks, how do we avoid them altogether or at least reduce
 
 ### 1. Use Context for Cancellation
 
-The `context` package is your best friend when managing goroutine lifecycles. By passing a context and listening for `ctx.Done()`, you can gracefully terminate background tasks when they’re no longer needed.
+The `context` package is your best friend when managing goroutine lifecycles. By passing a context and listening for `ctx.Done()`, you can gracefully terminate background tasks when they're no longer needed.
 
 ```go
 func doWork(ctx context.Context) {

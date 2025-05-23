@@ -7,7 +7,6 @@ tags:
 - ci/cd
 - deployment efficiency
 - docker
-- for
 - image optimization
 - multi-stage
 - multi-stage builds
@@ -21,13 +20,13 @@ In modern software development, **Continuous Integration and Continuous Delivery
 
 One of the most powerful tools for achieving efficient builds in containerized environments is **multi-stage builds** in Docker. Initially introduced in Docker 17.05, multi-stage builds allow developers to separate the build process into distinct stages, enabling them to produce smaller, more secure final images without sacrificing functionality.
 
-In this blog post, we’ll explore how to optimize multi-stage builds to enhance CI/CD pipelines, focusing on best practices, common pitfalls, and real-world use cases.
+In this blog post, we'll explore how to optimize multi-stage builds to enhance CI/CD pipelines, focusing on best practices, common pitfalls, and real-world use cases.
 
 ## What Are Multi-Stage Builds?
 
 A multi-stage Docker build uses multiple `FROM` statements within a single Dockerfile. Each `FROM` instruction begins a new stage of the build. Artifacts from one stage can be selectively copied into the next, allowing you to discard unnecessary build dependencies before producing the final image.
 
-Here’s a basic example of a multi-stage build for a Go application:
+Here's a basic example of a multi-stage build for a Go application:
 
 ```dockerfile
 # Build stage
@@ -58,7 +57,7 @@ Optimizing multi-stage builds is crucial for several reasons:
 
 ### 1. **Stage Separation Based on Purpose**
 
-Separate your Dockerfile into clearly defined stages: one or more for building, and one for the final runtime image. This principle separates concerns and ensures only what’s necessary is included in the final image.
+Separate your Dockerfile into clearly defined stages: one or more for building, and one for the final runtime image. This principle separates concerns and ensures only what's necessary is included in the final image.
 
 - **Build Stage(s)**: Include all build tools, dependencies, and source code.
 - **Test Stage** (optional): Use a separate stage to run tests if they require specific runtime configurations.
@@ -76,7 +75,7 @@ Using floating tags like `latest` can lead to inconsistent builds and unexpected
 
 ### 3. **Minimize Data Copied Between Stages**
 
-Only copy what’s necessary from earlier stages to the final one. Avoid copying the entire filesystem or unnecessary dependencies. Use targeted `COPY --from=...` instructions:
+Only copy what's necessary from earlier stages to the final one. Avoid copying the entire filesystem or unnecessary dependencies. Use targeted `COPY --from=...` instructions:
 
 ```dockerfile
 COPY --from=builder /app/myapp /usr/local/bin/myapp
@@ -112,7 +111,7 @@ For production environments, consider using minimal base images like `scratch`, 
 FROM gcr.io/distroless/static-debian12
 ```
 
-These images don’t include package managers, shells, or other unnecessary components, reducing image size and improving security.
+These images don't include package managers, shells, or other unnecessary components, reducing image size and improving security.
 
 ### 6. **Combine Related Stages**
 

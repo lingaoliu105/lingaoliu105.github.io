@@ -1,16 +1,14 @@
 ---
 title: "Running Nginx in Docker: A Practical Guide"
 layout: single
-post-image: "https://images.unsplash.com/photo-1598587561463-0e82f3c02f7d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60"
-description: "Learn how to run Nginx in Docker with this practical guide, covering setup, configuration, and optimization for seamless containerized web server deployment."
+description: "Learn how to run Nginx in Docker with this practical guide, covering setup, configuration, and best practices for web servers."
 tags:
-- containerization
-- docker
-- in
-- nginx
-- optimization
-- running
-- web server
+  - containerization
+  - docker
+  - nginx
+  - optimization
+  - running
+  - web server
 ---
 
 
@@ -36,9 +34,9 @@ This command does several things:
 - `-d` runs the container in detached mode (in the background).
 - `nginx` tells Docker to use the official Nginx image.
 
-Once executed, you’ll have a basic Nginx server up and running. You can verify this by visiting `http://localhost` in your browser or using `curl http://localhost`.
+Once executed, you'll have a basic Nginx server up and running. You can verify this by visiting `http://localhost` in your browser or using `curl http://localhost`.
 
-However, this default setup is limited — you can’t easily modify configurations or serve your own static files. Let’s take it a step further.
+However, this default setup is limited — you can't easily modify configurations or serve your own static files. Let's take it a step further.
 
 ## Customizing Nginx Configuration
 
@@ -106,7 +104,7 @@ Now when you visit `http://localhost`, it will display your custom HTML content.
 
 ## Managing Logs Outside of Docker
 
-By default, logs are written inside the Docker container. However, for easier debugging and monitoring, it’s often better to mount log directories from your host system.
+By default, logs are written inside the Docker container. However, for easier debugging and monitoring, it's often better to mount log directories from your host system.
 
 You can do this by adding another volume mapping for logs:
 
@@ -122,7 +120,7 @@ This will store access logs and error logs in your local `./logs` directory. It 
 
 ## Using Environment Variables (Optional)
 
-While Nginx doesn’t natively support environment variables in its configuration files like some other services (e.g., Node.js), there are workarounds using tools like **envsubst** during startup scripts if needed. This technique allows dynamic configuration based on runtime variables — useful for multi-environment deployments (development/staging/production).
+While Nginx doesn't natively support environment variables in its configuration files like some other services (e.g., Node.js), there are workarounds using tools like **envsubst** during startup scripts if needed. This technique allows dynamic configuration based on runtime variables — useful for multi-environment deployments (development/staging/production).
 
 A typical approach involves writing an entrypoint script that replaces placeholders in an `.conf.template` file with actual values before starting Nginx.
 
@@ -132,7 +130,7 @@ Here are some tips to keep your deployments robust and maintainable:
 
 1. **Use named containers** – Assigning names makes management easier via commands like `docker stop my-nginx`.
 
-2. **Don’t ignore restart policies** – Use flags like `--restart unless-stopped` so that containers restart automatically after system reboots or crashes:
+2. **Don't ignore restart policies** – Use flags like `--restart unless-stopped` so that containers restart automatically after system reboots or crashes:
    ```bash
    docker run --name my-nginx --restart unless-stopped ...
    ```

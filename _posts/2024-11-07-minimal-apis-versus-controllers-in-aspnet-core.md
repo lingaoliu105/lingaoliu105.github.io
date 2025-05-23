@@ -3,22 +3,20 @@ title: "Minimal APIs versus Controllers in ASP.NET Core"
 layout: single
 description: "Explore the differences between Minimal APIs and Controllers in ASP.NET Core including performance structure and use cases for modern web development."
 tags:
-- apis
-- asp.net
-- asp.net core
-- controllers
-- core
-- in
-- minimal
-- minimal apis
-- performance
-- vs
-- web development
+  - apis
+  - asp.net
+  - asp.net core
+  - controllers
+  - core
+  - minimal
+  - minimal apis
+  - performance
+  - web development
 ---
 
 # Minimal APIs versus Controllers in ASP.NET Core
 
-When building web APIs in ASP.NET Core, developers are presented with two primary styles of defining endpoints: the **traditional controller-based approach** and the newer **Minimal APIs** introduced in ASP.NET Core 6. Each has its own strengths, use cases, and developer experience trade-offs. In this post, we’ll compare these two models, explore their benefits and drawbacks, and help you decide when to use each.
+When building web APIs in ASP.NET Core, developers are presented with two primary styles of defining endpoints: the **traditional controller-based approach** and the newer **Minimal APIs** introduced in ASP.NET Core 6. Each has its own strengths, use cases, and developer experience trade-offs. In this post, we'll compare these two models, explore their benefits and drawbacks, and help you decide when to use each.
 
 ## Introduction to the Two Approaches
 
@@ -26,11 +24,11 @@ ASP.NET Core has long been known for its flexibility and performance, especially
 
 With the release of .NET 6, Microsoft introduced **Minimal APIs**, a lightweight and modern alternative that allows developers to define endpoints using a more functional and streamlined syntax. This model reduces boilerplate code and emphasizes convention-based routing and lambda-style handlers.
 
-Let’s explore the differences and see where each approach shines.
+Let's explore the differences and see where each approach shines.
 
 ## Controllers: The Established Way
 
-Controllers have been the backbone of ASP.NET MVC and Web API since the early days. In ASP.NET Core, they’re still the preferred way to structure complex applications with a need for rich features like:
+Controllers have been the backbone of ASP.NET MVC and Web API since the early days. In ASP.NET Core, they're still the preferred way to structure complex applications with a need for rich features like:
 
 - Action filters (authorization, logging, etc.)
 - Model validation and binding
@@ -38,7 +36,7 @@ Controllers have been the backbone of ASP.NET MVC and Web API since the early da
 - Built-in support for content negotiation (JSON/XML)
 - Organized routing by controller and convention
 
-Here’s a simple controller example:
+Here's a simple controller example:
 
 ```csharp
 [ApiController]
@@ -57,14 +55,14 @@ Controllers are great when:
 
 - You have a large application with many endpoints
 - You need to apply cross-cutting concerns like authentication or logging
-- You’re following a domain-driven or layered architecture
+- You're following a domain-driven or layered architecture
 - You prefer separation of concerns and testability via dependency injection
 
 With controllers, you can also take advantage of features like `ModelState` validation, action results, and middleware filters in a structured way.
 
 ## Minimal APIs: The Lightweight Alternative
 
-Minimal APIs provide a new way to build HTTP endpoints with minimal ceremony. They’re ideal for small services, microservices, or APIs with few endpoints, where you want to avoid the overhead of creating controller classes and action methods.
+Minimal APIs provide a new way to build HTTP endpoints with minimal ceremony. They're ideal for small services, microservices, or APIs with few endpoints, where you want to avoid the overhead of creating controller classes and action methods.
 
 The same endpoint shown above can be written using Minimal APIs like this:
 
@@ -86,7 +84,7 @@ Minimal APIs are great when:
 - You're experimenting or building a prototype quickly
 - You prefer a functional approach to defining endpoints
 
-They’re also useful for embedding API logic directly in `Program.cs`, making them ideal for projects using the new C# top-level statements model.
+They're also useful for embedding API logic directly in `Program.cs`, making them ideal for projects using the new C# top-level statements model.
 
 ## Key Differences
 

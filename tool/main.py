@@ -26,12 +26,13 @@ def setup_logging():
     # For simplicity, placing in project root for now.
 
     logging.basicConfig(
-        level=logging.DEBUG,
-        format="%(asctime)s - %(levelname)s - %(name)s - %(module)s - %(message)s",
+        level=logging.INFO,
+        format="%(asctime)s - %(levelname)s - %(filename)s:%(lineno)d - %(name)s - %(module)s - %(message)s",
         handlers=[
             logging.FileHandler(log_file_path),
             logging.StreamHandler(sys.stdout) # Also log to console
-        ]
+        ],
+        datefmt='%H:%M:%S'
     )
     # Set higher level for noisy libraries if needed, e.g.:
     # logging.getLogger("openai").setLevel(logging.WARNING)
@@ -120,20 +121,10 @@ def main():
             # Start with LLM generated tags (which might be an empty list)
             current_post_tags = post_details.get("tags", []) 
             logger.info(f"LLM suggested tags: {current_post_tags}")
-
-            # Add tags derived from the current keyword as a fallback or supplement
-            # if LLM didn't provide any or to ensure keyword presence.
-            keyword_based_tags = [tag.strip().lower().replace(" ", "-") for tag in current_keyword.split()]
-            current_post_tags.extend(keyword_based_tags)
-            
-            # Add default tags provided via command line argument
-            if args.tags:
-                default_tags = [dt.strip().lower() for dt in args.tags]
-                current_post_tags.extend(default_tags)
             
             # Ensure all tags are lowercase, unique, and sorted
             final_post_tags = sorted(list(set([tag.lower() for tag in current_post_tags if tag]))) # Filter out empty tags if any
-            logger.info(f"Final tags for post '{post_details["title"]}': {final_post_tags}")
+            logger.info(f"Final tags for post '{post_details['title']}': {final_post_tags}")
 
             blog_file_path = create_jekyll_post_file(
                 title=post_details["title"],

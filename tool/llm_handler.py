@@ -83,8 +83,9 @@ class LLMHandler:
             response_json = response.json()
             request_end_time = time.time()
             request_duration = request_end_time - request_start_time
-            logger.debug(f"LLM request completed in {request_duration:.2f} seconds")
-            logger.debug(f"Received LLM response: {json.dumps(response_json, indent=2)[:500]}...")
+            logger.info(f"LLM request completed in {request_duration:.2f} seconds")
+            logger.debug(f"Received LLM response JSON: {json.dumps(response_json, indent=2)[:500]}...")
+            logger.info(f"Received LLM response: {response_json['choices'][0]['message']['content']}")
             
             # Assuming OpenAI-compatible response structure
             if response_json.get("choices") and isinstance(response_json["choices"], list) and len(response_json["choices"]) > 0:
@@ -126,6 +127,7 @@ class LLMHandler:
         if not response_text:
             return []
         # Remove any leading/trailing fluff like "Suggested Tags: " or similar
+        logger.debug("LLM response for tags:", response_text)
         cleaned_response = response_text.strip()
         if cleaned_response.lower().startswith("suggested tags:"):
             cleaned_response = cleaned_response[len("suggested tags:"):].strip()
@@ -135,6 +137,7 @@ class LLMHandler:
         tags = [tag.strip().lower() for tag in cleaned_response.split(',') if tag.strip()]
         # Further cleaning: remove any potential quotes around individual tags
         tags = [tag.strip('"').strip("'") for tag in tags]
+        logger.debug(tags)
         return list(set(tags)) # Return unique tags
 
     def generate_tags_for_post(self, title, description, content_preview_length=200):

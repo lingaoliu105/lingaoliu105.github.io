@@ -1,14 +1,13 @@
 ---
 title: "Building Custom Schedulers in Go: A Practical Guide"
 layout: single
-post-image: ""
+
 description: "Learn how to build efficient custom schedulers in Go with this practical guide, covering design patterns, concurrency best practices, and real-world implementation examples."
 tags:
 - concurrency
 - custom
 - design patterns
 - go
-- in
 - practical guide
 - schedulers
 ---
@@ -31,7 +30,7 @@ Common use cases for custom schedulers include:
 - **Workload Isolation**: Preventing one slow task from affecting the execution of others.
 - **Specialized Queueing**: Using advanced queue structures like priority queues or job dependencies.
 
-Using a custom scheduler doesn’t replace the Go runtime scheduler, but sits on top of it to manage when and how your application-level tasks are executed.
+Using a custom scheduler doesn't replace the Go runtime scheduler, but sits on top of it to manage when and how your application-level tasks are executed.
 
 ## Basic Scheduler Design
 
@@ -41,7 +40,7 @@ At its core, a scheduler is responsible for:
 2. **Organizing** them (e.g., by priority or queue).
 3. **Executing** them in a desired order or pattern.
 
-Let’s start by building a simple, custom scheduler using Go channels and goroutines.
+Let's start by building a simple, custom scheduler using Go channels and goroutines.
 
 ```go
 package main
@@ -100,7 +99,7 @@ This is a starting point, but to make this scheduler useful for real-world appli
 
 ## Adding Priority with a Priority Queue
 
-To support task prioritization, we can modify the scheduler to use a priority queue instead of a regular channel. Go doesn’t have a built-in priority queue, but it’s easy to build one using a heap.
+To support task prioritization, we can modify the scheduler to use a priority queue instead of a regular channel. Go doesn't have a built-in priority queue, but it's easy to build one using a heap.
 
 ```go
 import (

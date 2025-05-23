@@ -1,7 +1,7 @@
 ---
 title: "Mastering Docker Compose: A Beginner's Guide"
 layout: single
-post-image: ""
+
 description: "Learn Docker Compose basics in this beginner's guide, covering setup, configuration, and managing multi-container applications efficiently."
 tags:
 - basics

@@ -1,7 +1,7 @@
 ---
 title: "Metaprogramming Magic with __class_getitem__ in Python"
 layout: single
-post-image: ""
+
 description: "Unlock the power of metaprogramming in Python using __class_getitem__ to create dynamic, flexible classes. Learn how this special method enables advanced techniques and enhances code functionality."
 tags:
 - __class_getitem__
@@ -10,7 +10,6 @@ tags:
 - dynamic classes
 - metaprogramming
 - python
-- with
 ---
 
 ## Metaprogramming Magic with `__class_getitem__` in Python
@@ -25,7 +24,7 @@ At first glance, using square brackets on a class like `MyClass[int]` might look
 
 Before `__class_getitem__`, indexing a class would raise a `TypeError`. Now, by defining this method on a class, you can control how it responds to such syntax. This is particularly useful for classes that represent generic types, as it allows them to return a specialized version of the class based on the type parameter provided.
 
-Here’s a minimal example:
+Here's a minimal example:
 
 ```python
 class MyGeneric:
@@ -52,15 +51,15 @@ from typing import List
 List[int]
 ```
 
-Behind the scenes, `List.__class_getitem__` is called with `int` as the type argument. This returns a `typing._GenericAlias` object representing the specialized type `List[int]`. This object isn’t an instance of `List`, but rather a type expression used by static type checkers like `mypy`.
+Behind the scenes, `List.__class_getitem__` is called with `int` as the type argument. This returns a `typing._GenericAlias` object representing the specialized type `List[int]`. This object isn't an instance of `List`, but rather a type expression used by static type checkers like `mypy`.
 
-This mechanism allows developers to build their own generic type systems or libraries that work seamlessly with Python’s type hinting infrastructure.
+This mechanism allows developers to build their own generic type systems or libraries that work seamlessly with Python's type hinting infrastructure.
 
 ## Implementing Custom Generic Classes
 
 You can use `__class_getitem__` to create your own generic classes, which can be used in type hints and also carry runtime behavior. Let's say you're building a data structure and want to track the type of data stored inside it.
 
-Here’s a basic example:
+Here's a basic example:
 
 ```python
 from typing import Any
@@ -78,7 +77,7 @@ print(IntContainer._type)  # <class 'int'>
 print(string_container._type)  # <class 'str'>
 ```
 
-In this case, we’re storing the type argument directly on the class. While simplistic, this pattern is the foundation for more advanced type-driven behaviors.
+In this case, we're storing the type argument directly on the class. While simplistic, this pattern is the foundation for more advanced type-driven behaviors.
 
 Note that this approach modifies the original class rather than returning a new one. In practice, you often want to return a new type (or a wrapper) to avoid polluting the base `Container` class.
 
@@ -86,7 +85,7 @@ Note that this approach modifies the original class rather than returning a new 
 
 Modifying the class directly can lead to unexpected behavior if multiple type arguments are used. To avoid this, a better approach is to return a new class or a proxy object that encapsulates the type argument.
 
-Here’s a more robust version:
+Here's a more robust version:
 
 ```python
 class BaseContainer:

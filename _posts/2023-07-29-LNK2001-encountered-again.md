@@ -1,19 +1,11 @@
 ---
-title: LNK 2001 errors AGAIN? But different cause!
-
+title: "LNK2001 Encountered Again"
 layout: single
-
-post-image: "https://res.cloudinary.com/startup-grind/image/upload/c_fill,dpr_2.0,f_auto,g_center,h_1080,q_100,w_1080/v1/gcs/platform-data-epic/events/ue4.png"
-
-description: Past experiences may not always apply.
-
+description: "Troubleshooting another LNK2001 error in a C++ project."
 tags:
-
-- Unreal Engine
-
-- C++
-
-- Visual Studio
+  - c++
+  - unreal engine
+  - visual studio
 ---
 An issue that's pretty much simillar as the previous one, where the log is like:
 

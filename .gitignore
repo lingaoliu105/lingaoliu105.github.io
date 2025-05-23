@@ -76,3 +76,4 @@ tool/__pycache__
 generation.log
 node_modules
 venv/
+blog_generation_tool.log

@@ -1,7 +1,7 @@
 ---
 title: "Effortless Data Sharing in Go: Zero-Copy Techniques for Goroutines"
 layout: single
-post-image: ""
+
 description: "Learn how to optimize concurrency in Go with zero-copy data sharing between goroutines, improving performance and reducing memory overhead in your applications."
 tags:
 - between
@@ -128,4 +128,6 @@ var counter int64
 
 go func() {
     for {
-        atomic.AddInt6
+        atomic.AddInt64(&counter, 1)
+    }
+}()

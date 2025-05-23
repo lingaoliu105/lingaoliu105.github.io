@@ -67,13 +67,24 @@ def create_jekyll_post_file(title, post_date_obj, description, content, tags):
         return None
 
     # Prepare front matter
-    front_matter_tags = "\n".join([f"- {tag}" for tag in tags]) if tags else ""
+    processed_tags = []
+    if tags:
+        for tag in tags:
+            cleaned_tag = tag.strip()
+            if not cleaned_tag: # Skip empty tags after stripping
+                logger.warning(f"Empty tag found and skipped for post titled '{title}'.")
+                continue
+            if ":" in cleaned_tag:
+                logger.warning(f"Tag '{cleaned_tag}' for post titled '{title}' contains a colon and will be skipped.")
+                continue
+            processed_tags.append(cleaned_tag)
+    
+    front_matter_tags = "\n".join([f"- {tag}" for tag in processed_tags]) if processed_tags else ""
     
     front_matter = (
         "---\n"
         f"title: \"{title}\"\n"
         f"layout: {layout}\n"
-        f"post-image: \"{post_image_url}\"\n"
         f"description: \"{description}\"\n"
     )
     if front_matter_tags:

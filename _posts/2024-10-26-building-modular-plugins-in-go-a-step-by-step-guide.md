@@ -1,7 +1,7 @@
 ---
 title: "Building Modular Plugins in Go: A Step-by-Step Guide"
 layout: single
-post-image: ""
+
 description: "Learn how to build modular plugins in Go using Go modules with this step-by-step guide. Discover best practices for creating, organizing, and managing plugins to enhance application extensibility and maintainability."
 tags:
 - application extensibility
@@ -13,7 +13,6 @@ tags:
 - modular design
 - modules
 - plugins
-- with
 ---
 
 ## Introduction
@@ -30,7 +29,7 @@ However, Go plugins are currently only supported on Linux and macOS platforms (a
 
 Go modules provide versioned dependency management, enabling you to modularize and maintain plugin packages effectively. When building plugins, Go modules help ensure that both the core application and plugins share compatible versions of dependencies. This becomes essential when multiple plugins are developed independently but must work together within the same host application.
 
-Let’s see how to structure a system that uses Go modules for building and managing plugins.
+Let's see how to structure a system that uses Go modules for building and managing plugins.
 
 ## Step 1: Define a Common Interface
 
@@ -65,7 +64,7 @@ import (
 )
 ```
 
-Here’s a simplified version of the host application:
+Here's a simplified version of the host application:
 
 ```go
 package main
@@ -103,7 +102,7 @@ This code loads a plugin file named `greeter_plugin.so` and looks for a symbol c
 
 ## Step 3: Build a Plugin Module
 
-Now let’s create a plugin that implements the `Greeter` interface. First, create a separate Go module:
+Now let's create a plugin that implements the `Greeter` interface. First, create a separate Go module:
 
 ```bash
 go mod init github.com/yourusername/greeter-plugin
@@ -148,7 +147,7 @@ This creates a shared object file that the host application can load at runtime.
 
 One of the key advantages of using Go modules is that both the host and the plugin can import the exact same version of the interface package. This ensures type compatibility at runtime.
 
-If you’re not publishing the interface module to a public repository, you can use Go’s `replace` directive in your `go.mod` files to reference it locally:
+If you're not publishing the interface module to a public repository, you can use Go's `replace` directive in your `go.mod` files to reference it locally:
 
 ```go
 replace github.com/yourusername/plugin-interface => ../plugin-interface
@@ -158,7 +157,7 @@ This allows you to develop and test the interface and plugins simultaneously wit
 
 ## Step 5: Plugin Discovery and Loading
 
-In a real-world scenario, your host application may need to discover and load multiple plugins from a directory. Here’s an example of how you could implement plugin discovery:
+In a real-world scenario, your host application may need to discover and load multiple plugins from a directory. Here's an example of how you could implement plugin discovery:
 
 ```go
 func loadPlugins(dir string) []greeter.Greeter {
@@ -181,4 +180,8 @@ func loadPlugins(dir string) []greeter.Greeter {
         }
 
         if g, ok := symbol.(greeter.Greeter); ok {
-            greeters = append(greeters,
+            greeters = append(greeters, g)
+        }
+    }
+    return greeters
+}

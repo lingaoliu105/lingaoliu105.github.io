@@ -1,7 +1,7 @@
 ---
 title: "Mastering Docker Networking: A Beginner's Guide"
 layout: single
-post-image: ""
+
 description: "Learn the fundamentals of Docker Networking with this beginner-friendly guide. Understand bridge networks, container communication, and best practices for managing network configurations in Docker."
 tags:
 - containerization

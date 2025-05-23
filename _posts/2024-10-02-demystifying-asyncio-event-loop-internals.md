@@ -1,7 +1,7 @@
 ---
 title: "Demystifying asyncio Event Loop Internals"
 layout: single
-post-image: ""
+
 description: "Explore the inner workings of the asyncio event loop, including how it manages tasks, handles I/O operations, and enables efficient asynchronous programming in Python."
 tags:
 - asynchronous programming

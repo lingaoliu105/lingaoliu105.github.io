@@ -1,13 +1,11 @@
 ---
-title: What is Jekyll? How to use it?
+title: "What is Jekyll and How to Use It?"
 layout: single
-post-image: "http://jekyllcn.com/img/logo-2x.png"
-description: Jekyll is a static site generator. You give it text written in your favorite
-  markup language and it uses layouts to create a static website.
+description: "An introduction to Jekyll, a static site generator, and how to get started with it."
 tags:
-- jekyll
-- blog
-- starter's guide
+  - blog
+  - jekyll
+  - starter's guide
 ---
 Jekyll is a simple, blog-aware, static site generator perfect for personal, project, or organization sites. Think of it like a file-based CMS, without all the complexity. Jekyll takes your content, renders Markdown and Liquid templates, and spits out a complete, static website ready to be served by Apache, Nginx or another web server. Jekyll is the engine behind GitHub Pages, which you can use to host sites right from your GitHub repositories and if you don't know what GitHub Pages are you can visit on click [here](https://help.github.com/en/github/working-with-github-pages/about-github-pages){:target="blank"} or [here](https://pages.github.com/){:target="blank"}
 

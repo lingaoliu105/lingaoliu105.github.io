@@ -198,6 +198,7 @@ exclude:
   - generation.log
   - tool/__pycache__
   - start_tool.sh
+  - blog_generation_tool.log
 keep_files:
   - .git
   - .svn

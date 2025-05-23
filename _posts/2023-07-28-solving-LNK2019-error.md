@@ -1,19 +1,11 @@
 ---
-title: Encountered LNK 2019 and LNK 2001 errors when building UE project
-
+title: "Solving LNK2019 Unresolved External Symbol Errors in C++"
 layout: single
-
-post-image: "https://res.cloudinary.com/startup-grind/image/upload/c_fill,dpr_2.0,f_auto,g_center,h_1080,q_100,w_1080/v1/gcs/platform-data-epic/events/ue4.png"
-
-description: A small problem for me as a fresh UE C++ developer
-
+description: "A guide to understanding and resolving LNK2019 errors in C++ projects, focusing on common causes and solutions."
 tags:
-
-- Unreal Engine
-
-- C++
-
-- Visual Studio
+  - c++
+  - unreal engine
+  - visual studio
 ---
 I recently changed my projectiles hierachy of my Unreal game, moving some declarations of hit and overlap event handler into the base class. To enable polymophism, I declared those functions as `virtual` , but since UE doesn't allow UCLASS classes to have pure virtual functions, I did not give it a value or a definition. Just left them like:
 

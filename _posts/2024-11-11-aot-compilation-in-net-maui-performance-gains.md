@@ -9,7 +9,6 @@ tags:
 - aot compilation
 - apps
 - compilation
-- in
 - maui
 - performance optimization
 - resource management
@@ -18,11 +17,11 @@ tags:
 
 # AOT Compilation in .NET MAUI: Performance Gains
 
-With the evolution of .NET and the introduction of .NET MAUI (Multi-platform App UI), developers now have more tools than ever to build high-performance, cross-platform native applications using C# and XAML. One of the most exciting performance improvements available is **Ahead-Of-Time (AOT) compilation**. AOT compilation allows .NET applications to be compiled into native machine code before runtime, reducing startup time and memory usage. In this blog post, we’ll explore what AOT compilation is, how it works in the context of .NET MAUI apps, and the tangible performance benefits it brings.
+With the evolution of .NET and the introduction of .NET MAUI (Multi-platform App UI), developers now have more tools than ever to build high-performance, cross-platform native applications using C# and XAML. One of the most exciting performance improvements available is **Ahead-Of-Time (AOT) compilation**. AOT compilation allows .NET applications to be compiled into native machine code before runtime, reducing startup time and memory usage. In this blog post, we'll explore what AOT compilation is, how it works in the context of .NET MAUI apps, and the tangible performance benefits it brings.
 
 ## What is AOT Compilation?
 
-Traditionally, .NET applications use **Just-In-Time (JIT)** compilation, where the Common Intermediate Language (CIL) code is translated into native machine code at runtime by the .NET runtime’s JIT compiler. While JIT offers flexibility and portability, it has a downside: the compilation process during startup adds overhead, especially noticeable in performance-sensitive scenarios.
+Traditionally, .NET applications use **Just-In-Time (JIT)** compilation, where the Common Intermediate Language (CIL) code is translated into native machine code at runtime by the .NET runtime's JIT compiler. While JIT offers flexibility and portability, it has a downside: the compilation process during startup adds overhead, especially noticeable in performance-sensitive scenarios.
 
 AOT compilation, on the other hand, compiles C# code directly to native machine code at **build time** rather than runtime. This is achieved using tools like **CoreRT** or the newer AOT capabilities integrated into the .NET SDK (starting with .NET 7). The result is a standalone native binary that can be executed without needing a runtime JIT compiler.
 
@@ -34,7 +33,7 @@ AOT compilation can significantly improve:
 
 - **Startup time**: By eliminating JIT warm-up, apps can launch faster.
 - **Memory usage**: Native compiled code doesn't require the memory overhead of the JIT compiler.
-- **Security**: AOT-compiled apps can be more resistant to reverse-engineering since they don’t contain intermediate bytecode.
+- **Security**: AOT-compiled apps can be more resistant to reverse-engineering since they don't contain intermediate bytecode.
 - **Efficiency**: Native binaries can be optimized more aggressively, especially for architecture-specific performance.
 
 ## How AOT Works in .NET MAUI

@@ -3,14 +3,13 @@ title: "C# Meets Native WebAssembly Interop"
 layout: single
 description: "Explore how C# integrates with native WebAssembly for seamless interop and enhanced web application performance. Learn the key techniques and benefits of combining these powerful technologies."
 tags:
-- .net
-- and
-- between
-- c#
-- interop
-- native
-- performance
-- webassembly
+  - .net
+  - between
+  - c#
+  - interop
+  - native
+  - performance
+  - webassembly
 ---
 
 # C# Meets Native WebAssembly Interop
@@ -53,7 +52,7 @@ Using C# bindings like **Wasmtime's .NET SDK**, you can host and invoke WebAssem
 
 ### Example: Calling a Rust-Compiled WebAssembly Function from C#
 
-Let’s walk through a simple example. Suppose you have a function in Rust that you compile to WebAssembly:
+Let's walk through a simple example. Suppose you have a function in Rust that you compile to WebAssembly:
 
 ```rust
 #[no_mangle]
@@ -84,7 +83,7 @@ This demonstrates a native Wasm module being directly invoked from a C# host. Wi
 
 Calling C# from a Wasm module is more complex. Since WebAssembly modules cannot natively call into .NET code (unless the host exposes it explicitly), it requires the Wasm runtime to **import functions from the host**.
 
-Let’s take a simple example where the Wasm module expects a logging function from the host:
+Let's take a simple example where the Wasm module expects a logging function from the host:
 
 ```wat
 (import "env" "log" (func $log (param i32)))
@@ -117,5 +116,3 @@ This allows a Wasm module to call back into C# via host-defined imports.
 ## Challenges in Interoperability
 
 While the basic mechanics are straightforward, you'll quickly run into some **challenges**:
-
-- **

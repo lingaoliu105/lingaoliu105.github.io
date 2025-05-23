@@ -1,7 +1,7 @@
 ---
 title: "Source Generators in .NET 6: Boost Performance and Reduce Runtime Overhead"
 layout: single
-post-image: ""
+
 description: "Learn how source generators in .NET 6 improve performance by reducing runtime overhead through compile-time code generation. Discover benefits, use cases, and optimization tips in this in-depth technical guide."
 tags:
 - .net
@@ -9,7 +9,6 @@ tags:
 - 6+
 - compile-time code
 - generators
-- in
 - performance optimization
 - runtime overhead
 - source
@@ -60,7 +59,7 @@ Source generators can validate certain patterns or constraints at compile time, 
 
 Let's look at a basic example of a source generator. You start by creating a class library that references `Microsoft.CodeAnalysis.CSharp` and `Microsoft.CodeAnalysis.Analyzers`. The generator itself is a class implementing the `ISourceGenerator` interface.
 
-Here’s a minimal implementation:
+Here's a minimal implementation:
 
 ```csharp
 [Generator]
